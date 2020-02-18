@@ -13,7 +13,7 @@ def main():
     while True:
         follow_followers(api)
         unfollow_non_followers(api)
-        time.sleep(RATE_LIMIT_BREAK)
+        time.sleep(RATE_LIMIT_BREAK*2)
 
 
 if __name__ == "__main__":
