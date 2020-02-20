@@ -70,19 +70,21 @@ class BotStreamListener(tweepy.StreamListener):
         """
         try:
             logger.info(f'Current since_id: {self.since_id}')
+            logger.info(f'Current tweet id: {tweet.id}')
             if self.is_my_tweet(tweet) or tweet.id <= self.since_id:
-                logger.warning(f'You\'ve already checked this or it\'s your own'
-                               f'tweet!')
-                print()
+                logger.warning(f"You've already checked this or it's your own"
+                               ' tweet!')
+                print('\n')
                 return None
 
             self.since_id = tweet.id
-            logger.info(tweet.text)
+            logger.info(f'Current tweet text: {tweet.text}')
 
             # Reply to mention.
             if self.me.screen_name.lower() in tweet.text.lower():
                 self.reply_to_mention(tweet)
                 logger.info(f'Replied to {tweet.user.screen_name}')
+                print('\n')
                 time.sleep(10)
                 return None
 
@@ -90,11 +92,9 @@ class BotStreamListener(tweepy.StreamListener):
             self.like(tweet)
             time.sleep(5)
             self.retweet(tweet)
-            print('is retweeted: ', tweet.retweeted, 'is liked: ',
-                  tweet.favorited)
-            print()
 
             logger.info(f'New since_id: {self.since_id}')
+            print('\n')
             time.sleep(10)
         except tweepy.TweepError as e:
             bots.utils.print_tweepy_error(e)
