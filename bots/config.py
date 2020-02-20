@@ -29,5 +29,4 @@ KEYWORDS: List[str] = []
 ACCOUNTS_TO_WATCH: List[str] = [
     'magicandcode',
     'ZtmBot',
-    'womeninwebdev',
 ]
