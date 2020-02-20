@@ -3,12 +3,12 @@
 ![chatbot illustration](/../master/twitter-bots.png?raw=true "chatbot repository decorative illustration")
 
 Currently there are two bots: `poll.py` and `stream.py`
-#### poll.py
+### poll.py
 This bot polls the Twitter API for its followers. It will follow any follower and unfollow ex followers.
 It does not use a stream but rather runs the function for following and unfollowing in an infinite `while` loop, sleeping at the end of each iteration to not exceed the API rate limit.
 
-#### stream.py
-This bot uses a stream to receive tweets form matching tracked sources in a live feed. it will ignore tweets where the API user is the author and handle other tweets accordingly;
+### stream.py
+This bot uses a stream to receive tweets form matching tracked sources in a live feed. It will ignore tweets where the API user is the author and handle other tweets accordingly;
 * Reply to a mention which is not also a reply.
 * Retweet and like any non-mentions from tracked sources.
 
@@ -34,16 +34,16 @@ https://devcenter.heroku.com/articles/dyno-sleeping
 No dynos on ⬢ magicandcode-bot
 $ heroku ps:scale stream=1
 Scaling dynos... done, now running stream at 1:Free
-$ heroku ps:scale worker=1
-Scaling dynos... done, now running worker at 1:Free
+$ heroku ps:scale poll=1
+Scaling dynos... done, now running poll at 1:Free
 ```
 
 Scale down dynos (take one or both bots offline):
 ```
 $ heroku ps:scale stream=0
 Scaling dynos... done, now running stream at 0:Free
-$ heroku ps:scale worker=0
-Scaling dynos... done, now running worker at 0:Free
+$ heroku ps:scale poll=0
+Scaling dynos... done, now running poll at 0:Free
 ```
 
 Note that this is only tested on macOS. For Windows CMD or Powershell do I refer to the [official documentation](https://devcenter.heroku.com/articles/getting-started-with-python).
@@ -54,7 +54,7 @@ Note that this is only tested on macOS. For Windows CMD or Powershell do I refer
 * [tweepy](http://www.tweepy.org/) - Twitter API wrapper
 * [environs](https://pypi.org/project/environs/) - Environment variables parsing
 
-Technically `environs` isn't needed but I have been unable to read environmental variables properly with `os.getenv`. It may however be an issue with PyCharm or other special circumstance. But since `environs` works locally I have not tested `os.getenv` on Heroku. however I do assume it's working.
+I use `environs` due to preference but it may be replaced with `os.getenv` or similar.
 
 ### Attributions
 * Image by [mohamed Hassan](https://pixabay.com/users/mohamed_hassan-5229782/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3589528) [Pixabay](https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3589528)
