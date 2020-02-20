@@ -25,15 +25,14 @@ class BotStreamListener(tweepy.StreamListener):
 
     def is_mention(self, tweet: tweepy.Status) -> bool:
         """Check if a tweet is a mention."""
-        return self.me.screen_name in tweet.text
+        return '@' + self.me.screen_name in tweet.text
 
     def reply_to_mention(self, tweet: tweepy.Status) -> None:
-        """Reply to a mention, only if tweet is not a reply."""
-        if tweet.in_reply_to_status_id is None and self.is_mention(tweet):
-            status = f'@{tweet.user.screen_name} Hi fellow developer! 🐍'
-            self.api.update_status(status=status,
-                                   in_reply_to_status_id=tweet.id_str,
-                                   auto_populate_reply_metadata=True)
+        """Reply to a mention."""
+        status = f'@{tweet.user.screen_name} Hi fellow developer! 🐍'
+        self.api.update_status(status=status,
+                               in_reply_to_status_id=tweet.id_str,
+                               auto_populate_reply_metadata=True)
 
     def is_my_tweet(self, tweet: tweepy.Status) -> bool:
         """Check if API user is author of tweet."""
@@ -64,37 +63,38 @@ class BotStreamListener(tweepy.StreamListener):
         print('friends')
         print(friends)
 
-    def on_status(self, tweet):
-        """Print new tweet if it contains keywords and or its author is
-         in the accounts to watch.
+    def on_status(self, tweet: tweepy.Status) -> None:
+        """Retweet and like matching tweets containing keywords and/or
+         by accounts to watch.
         """
         try:
+            time.sleep(8)
             logger.info(f'Current since_id: {self.since_id}')
             logger.info(f'Current tweet id: {tweet.id}')
             if self.is_my_tweet(tweet) or tweet.id <= self.since_id:
                 logger.warning(f"You've already checked this or it's your own"
                                ' tweet!')
-                print('\n')
+                print()
                 return None
 
             self.since_id = tweet.id
             logger.info(f'Current tweet text: {tweet.text}')
 
             # Reply to mention.
-            if self.me.screen_name.lower() in tweet.text.lower():
+            if tweet.in_reply_to_status_id is None and self.is_mention(tweet):
                 self.reply_to_mention(tweet)
                 logger.info(f'Replied to {tweet.user.screen_name}')
-                print('\n')
+                print()
                 time.sleep(10)
                 return None
 
             # Like and retweet tracked tweets.
             self.like(tweet)
-            time.sleep(5)
+            time.sleep(4)
             self.retweet(tweet)
 
             logger.info(f'New since_id: {self.since_id}')
-            print('\n')
+            print()
             time.sleep(10)
         except tweepy.TweepError as e:
             bots.utils.print_tweepy_error(e)
@@ -122,7 +122,10 @@ def filter_stream(api: tweepy.API, is_async: bool = True) -> None:
     accounts: List[str] = [api.get_user(user_id).id_str for user_id in
                            bots.config.ACCOUNTS_TO_WATCH]
     stream = get_stream(api)
-    stream.filter(track=bots.config.KEYWORDS, follow=accounts, is_async=is_async)
+    if bots.config.TRACK_MENTIONS:
+        bots.config.KEYWORDS.add('@' + api.me().screen_name)
+    stream.filter(track=bots.config.KEYWORDS, follow=accounts,
+                  is_async=is_async)
 
 
 if __name__ == '__main__':
