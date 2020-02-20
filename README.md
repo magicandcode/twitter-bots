@@ -1,5 +1,6 @@
 # Twitter Bots
 ### Testing and experimenting with the Twitter API
+![chatbot illustration](/../master/twitter-bots.png?raw=true "chatbot repository decorative illustration")
 
 Currently there are two bots: `run.py` and `stream.py`
 #### run.py
