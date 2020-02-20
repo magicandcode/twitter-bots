@@ -55,3 +55,6 @@ Note that this is only tested on macOS. For Windows CMD or Powershell do I refer
 * [environs](https://pypi.org/project/environs/) - Environment variables parsing
 
 Technically `environs` isn't needed but I have been unable to read environmental variables properly with `os.getenv`. It may however be an issue with PyCharm or other special circumstance. But since `environs` works locally I have not tested `os.getenv` on Heroku. however I do assume it's working.
+
+### Attributions
+* Image by [mohamed Hassan](https://pixabay.com/users/mohamed_hassan-5229782/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3589528) [Pixabay](https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3589528)
