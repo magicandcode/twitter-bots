@@ -6,7 +6,7 @@ from typing import List
 
 import tweepy
 
-from bot.config import RATE_LIMIT_BREAK
+from bots.config import RATE_LIMIT_BREAK
 
 
 def print_tweepy_error(e) -> None:
