@@ -6,9 +6,9 @@ from typing import Optional
 
 import tweepy
 
-from bot.logger import logger
-from bot.config import RATE_LIMIT_BREAK, ACTION_BRAKE
-from bot.utils import api_cursor, print_tweepy_error
+from bots.logger import logger
+from bots.config import RATE_LIMIT_BREAK, ACTION_BRAKE
+from bots.utils import api_cursor, print_tweepy_error
 
 
 def is_follower(api: tweepy.API, user_id: str) -> bool:

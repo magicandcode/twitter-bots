@@ -23,10 +23,11 @@ RATE_LIMIT_BREAK: int = 60
 prefix: str = 'python'
 keywords: List[str] = [prefix, 'programming', 'developer', 'programmer',
                        'development']
-KEYWORDS: List[str] = ([prefix+' '+keyword for keyword in keywords if
-                        prefix not in keyword]+[prefix+keyword for keyword in
-                                                keywords if
-                                                prefix not in keyword]+keywords)
+KEYWORDS: List[str] = []
 
 # Accounts.
-ACCOUNTS_TO_WATCH: List[str] = []
+ACCOUNTS_TO_WATCH: List[str] = [
+    'magicandcode',
+    'ZtmBot',
+    'womeninwebdev',
+]
