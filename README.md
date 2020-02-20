@@ -2,8 +2,8 @@
 ### Testing and experimenting with the Twitter API
 ![chatbot illustration](/../master/twitter-bots.png?raw=true "chatbot repository decorative illustration")
 
-Currently there are two bots: `run.py` and `stream.py`
-#### run.py
+Currently there are two bots: `poll.py` and `stream.py`
+#### poll.py
 This bot polls the Twitter API for its followers. It will follow any follower and unfollow ex followers.
 It does not use a stream but rather runs the function for following and unfollowing in an infinite `while` loop, sleeping at the end of each iteration to not exceed the API rate limit.
 

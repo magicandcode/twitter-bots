@@ -1,7 +1,7 @@
 """
 Twitter API configuration module.
 """
-from typing import List
+from typing import List, Set
 
 from environs import Env
 
@@ -19,14 +19,13 @@ ACCESS_TOKEN_SECRET: str = env.str('ACCESS_TOKEN_SECRET')
 ACTION_BRAKE: int = 10
 RATE_LIMIT_BREAK: int = 60
 
-# Keywords.
-prefix: str = 'python'
-keywords: List[str] = [prefix, 'programming', 'developer', 'programmer',
-                       'development']
-KEYWORDS: List[str] = []
+# Keywords to track in stream.
+PREFIX: str = env.str('KEYWORD_PREFIX', '')
+KEYWORDS_TO_PREFIX: List[str] = env.list('KEYWORDS_TO_PREFIX', [])
+PREFIXED_KEYWORDS: List[str] = [(PREFIX + ' ' + keyword).strip()
+                                for keyword in KEYWORDS_TO_PREFIX]
+KEYWORDS: Set[str] = set(PREFIXED_KEYWORDS + env.list('TRACKED_KEYWORDS', []))
 
-# Accounts.
-ACCOUNTS_TO_WATCH: List[str] = [
-    'magicandcode',
-    'ZtmBot',
-]
+# Accounts to follow in stream.
+TRACK_MENTIONS: bool = env.bool('TRACK_MENTIONS', False)
+ACCOUNTS_TO_WATCH: List[str] = env.list('ACCOUNTS_TO_WATCH')
