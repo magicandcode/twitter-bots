@@ -29,7 +29,7 @@ class BotStreamListener(tweepy.StreamListener):
 
     def reply_to_mention(self, tweet: tweepy.Status) -> None:
         """Reply to a mention."""
-        status = f'@{tweet.user.screen_name} Hi fellow developer! 🐍'
+        status = f'@{tweet.user.screen_name} {bots.config.MENTION_REPLY}'
         self.api.update_status(status=status,
                                in_reply_to_status_id=tweet.id_str,
                                auto_populate_reply_metadata=True)
