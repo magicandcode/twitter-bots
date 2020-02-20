@@ -2,7 +2,7 @@
 Twitter API streaming module with stream listener and helper functions.
 """
 import time
-from typing import List
+from typing import List, Set
 
 import tweepy
 
@@ -122,6 +122,8 @@ def filter_stream(api: tweepy.API, is_async: bool = True) -> None:
     accounts: List[str] = [api.get_user(user_id).id_str for user_id in
                            bots.config.ACCOUNTS_TO_WATCH]
     stream = get_stream(api)
+    if bots.config.TRACK_HASHTAGS:
+        bots.config.KEYWORDS.update(bots.config.HASHTAGS)
     if bots.config.TRACK_MENTIONS:
         bots.config.KEYWORDS.add('@' + api.me().screen_name)
     stream.filter(track=bots.config.KEYWORDS, follow=accounts,
