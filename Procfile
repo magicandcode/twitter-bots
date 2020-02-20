@@ -1,2 +1,2 @@
-worker: python run.py
+poll: python poll.py
 stream: python stream.py
