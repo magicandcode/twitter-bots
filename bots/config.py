@@ -23,6 +23,12 @@ ACTION_BRAKE: int = env.int('ACTION_BRAKE', 10)
 RATE_LIMIT_BREAK: int = env.int('RATE_LIMIT_BREAK', 60)
 
 
+# Hashtags to track in stream.
+TRACK_HASHTAGS: bool = env.bool('TRACK_HASHTAGS', False)
+hashtags: List[str] = env.list('TRACKED_HASHTAGS', [])
+HASHTAGS = ['#' + hashtag for hashtag in hashtags]
+
+
 # Keywords to track in stream.
 PREFIX: str = env.str('KEYWORD_PREFIX', '')
 KEYWORDS_TO_PREFIX: List[str] = env.list('KEYWORDS_TO_PREFIX', [])
