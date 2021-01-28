@@ -23,7 +23,7 @@ Once you've done that you simply run each bot in a console with either `python -
 Deploying on Heroku is almost as simple as following the official [Python guide](https://devcenter.heroku.com/articles/getting-started-with-python).
 the `Procfile` differs and dynos won't be started automatically when the process type is other than `web`.
 This means that in order to run the bots you need to `scale` the dynos from 0 to 1. The free tier on Heroku gives you access to two free dynos.
-Scale up dynos via the Heroku ClI:
+Scale up dynos via the Heroku CLI:
 ```
 $ heroku ps
 Free dyno hours quota remaining this month: 550h 0m (100%)
