@@ -1,5 +1,5 @@
 # Twitter Bots
-### Testing and experimenting with the Twitter API
+### Testing and experimenting with the Twitter API (Standard 1.1)
 ![chatbot illustration](/../master/twitter-bots.png?raw=true "chatbot repository decorative illustration")
 
 There are two bots: `poll.py` and `stream.py`.
@@ -12,15 +12,20 @@ This bot uses a stream to receive tweets from matching tracked sources in a live
 * Reply to a mention which is not also a reply.
 * Retweet and like any non-mentions from tracked sources.
 
-## Hosting and installation
-The code is hosted and run on [Heroku](https://heroku.com/), on two free dynos.
+## Hosting
+The bots have been hosted and run on [Heroku](https://heroku.com/), on two free dynos.
 
+## Prerequisites
+You'll need a [Twitter developer account](https://developer.twitter.com/en/apply-for-access) to run the bots. Creating one is, unfortunately, not trivial. Be honest and say that you're trying out the API for developer and learning purposes. You'll also need a **website URL** to register a new app once your account is ready.
+
+## Usage
 I strongly recommend using a [virtual environment](https://docs.python.org/3/tutorial/venv.html).
 
-If you want to run the bots with your own Twitter API credentials, you need to export/set environmental variables according to `config.py`.
-Once you've done that, run each bot in a console with either `python -m poll` or `python -m stream`.
+Add your Twitter API credentials to `.env-sample` and set any additional settings according to the sample file and `config.py`. Save and rename the file to `.env`.
+Once you've made the initial configurations, run each bot in a console with either `python -m poll` or `python -m stream`.
 
-Deploying on Heroku is almost as simple as following the official [Python guide](https://devcenter.heroku.com/articles/getting-started-with-python).
+## Deployment
+Deploying the bots on Heroku is almost as simple as following the official [Heroku Python guide](https://devcenter.heroku.com/articles/getting-started-with-python) on web apps.
 The `Procfile` differs, and dynos won't start automatically when the process type is not `web`.
 To run the bots, you need to `scale` the dynos from 0 to 1. The free tier on Heroku gives you access to two free dynos.
 Scale-up dynos via the Heroku CLI:
@@ -48,13 +53,16 @@ Scaling dynos... done, now running poll at 0:Free
 
 Note that the instructions are tested on the macOS Terminal only. To use Windows CMD or Powershell, check the [official documentation](https://devcenter.heroku.com/articles/getting-started-with-python).
 
-
 ## Dependencies
 * [python >= 3.7](https://www.python.org/downloads/)
 * [tweepy](http://www.tweepy.org/) - Twitter API wrapper
 * [environs](https://pypi.org/project/environs/) - Environment variables parsing
 
-I use `environs`, but you can replace it with `python-dotenv`, `os.getenv` or similar.
+I use `environs`, but you can replace it with `python-dotenv`, `os.getenv` or similar. If you do, change the code in `config.py` to use your preferred package or module.
+
+## Todo:
+* Update to Twitter API v2
+* Use a more modern API wrapper like [twython](https://pypi.org/project/twython/)
 
 ## Attributions
 * Image by [mohamed Hassan](https://pixabay.com/users/mohamed_hassan-5229782/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3589528) [Pixabay](https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3589528)
