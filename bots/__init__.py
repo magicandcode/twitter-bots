@@ -5,7 +5,7 @@ Twitter API setup module with functions for creating and authenticating
 import tweepy
 
 import bots.utils
-from bots.config import (ACCESS_TOKEN, ACCESS_TOKEN_SECRET, CONSUMER_KEY,
+from config import (ACCESS_TOKEN, ACCESS_TOKEN_SECRET, CONSUMER_KEY,
                          CONSUMER_SECRET, )
 
 
@@ -17,7 +17,7 @@ def create_api() -> tweepy.API:
                                      wait_on_rate_limit_notify=True)
         api.verify_credentials()
     except tweepy.TweepError as e:
-        bots.utils.print_tweepy_error(e)
+        bots.utils.log_tweepy_error(e)
         exit(1)
     else:
         print(f'Tweepy API successfully created. Happy bot:ing'

@@ -7,9 +7,9 @@ from typing import Dict, Set
 
 import tweepy
 
-import bots.utils as utils
-import bots.config as config
+import config
 from bots.logger import logger
+import bots.utils as utils
 
 
 class BotStreamListener(tweepy.StreamListener):

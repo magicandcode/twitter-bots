@@ -7,8 +7,8 @@ from typing import Optional
 import tweepy
 
 from bots.logger import logger
-from bots.config import RATE_LIMIT_BREAK, ACTION_BRAKE
-from bots.utils import api_cursor, print_tweepy_error
+from bots.utils import api_cursor, log_tweepy_error
+from config import RATE_LIMIT_BREAK, ACTION_BRAKE
 
 
 def is_follower(api: tweepy.API, user_id: str) -> bool:
@@ -26,7 +26,7 @@ def follow_user(api: tweepy.API, user_id: str):
         user: tweepy.User = api.get_user(user_id)
         user.follow()
     except tweepy.TweepError as e:
-        print_tweepy_error(e)
+        log_tweepy_error(e)
 
 
 def unfollow_user(api: tweepy.API, user_id: str):
@@ -34,7 +34,7 @@ def unfollow_user(api: tweepy.API, user_id: str):
     try:
         api.destroy_friendship(id=user_id)
     except tweepy.TweepError as e:
-        print_tweepy_error(e)
+        log_tweepy_error(e)
 
 
 def follow_followers(api: tweepy.API) -> None:
@@ -49,7 +49,7 @@ def follow_followers(api: tweepy.API) -> None:
                             f'{follower.screen_name})')
                 time.sleep(ACTION_BRAKE)
             except tweepy.TweepError as e:
-                print_tweepy_error(e)
+                log_tweepy_error(e)
                 logger.info(f'Waiting {RATE_LIMIT_BREAK} seconds...')
                 time.sleep(RATE_LIMIT_BREAK)
 
@@ -68,6 +68,6 @@ def unfollow_non_followers(api: tweepy.API) -> None:
                             f'{friend.screen_name})')
                 time.sleep(ACTION_BRAKE)
             except tweepy.TweepError as e:
-                print_tweepy_error(e)
+                log_tweepy_error(e)
                 logger.info(f'Waiting {RATE_LIMIT_BREAK} seconds...')
                 time.sleep(RATE_LIMIT_BREAK)
