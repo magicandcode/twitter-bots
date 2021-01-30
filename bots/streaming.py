@@ -2,12 +2,13 @@
 Twitter API streaming module with stream listener and helper functions.
 """
 import time
+import sys
 from typing import List, Set
 
 import tweepy
 
-import bots.utils
-import bots.config
+import bots.utils as utils
+import bots.config as config
 from bots.logger import logger
 
 
@@ -29,12 +30,12 @@ class BotStreamListener(tweepy.StreamListener):
 
     def reply_to_mention(self, tweet: tweepy.Status) -> None:
         """Reply to a mention."""
-        status = f'@{tweet.user.screen_name} {bots.config.MENTION_REPLY}'
+        status = f'@{tweet.user.screen_name} {config.MENTION_REPLY}'
         self.api.update_status(status=status,
                                in_reply_to_status_id=tweet.id_str,
                                auto_populate_reply_metadata=True)
 
-    def is_my_tweet(self, tweet: tweepy.Status) -> bool:
+    def is_own_tweet(self, tweet: tweepy.Status) -> bool:
         """Check if API user is author of tweet."""
         return tweet.user.id == self.me.id
 
@@ -42,43 +43,39 @@ class BotStreamListener(tweepy.StreamListener):
     def retweet(tweet: tweepy.Status) -> None:
         """Retweet a tweet."""
         try:
-            # Todo: Run try block without if condition?
-            if not tweet.retweeted:
-                tweet.retweet()
+            tweet.retweet()
         except tweepy.TweepError as e:
-            bots.utils.print_tweepy_error(e)
+            utils.log_tweepy_error(e)
 
     @staticmethod
     def like(tweet: tweepy.Status) -> None:
         """Like a tweet."""
         try:
-            # Todo: Run try block without if condition?
-            if not tweet.favorited:
-                tweet.favorite()
+            tweet.favorite()
         except tweepy.TweepError as e:
-            bots.utils.print_tweepy_error(e)
+            utils.log_tweepy_error(e)
 
-    def on_friends(self, friends):
+    @staticmethod
+    def on_friends(friends):
         # Todo: Look up what kind of event this method handles.
-        print('friends')
-        print(friends)
+        logger.info(f'on_friends triggered: {friends=}')
 
     def on_status(self, tweet: tweepy.Status) -> None:
         """Retweet and like matching tweets containing keywords and/or
          by accounts to watch.
         """
         try:
-            time.sleep(8)
-            logger.info(f'Current since_id: {self.since_id}')
-            logger.info(f'Current tweet id: {tweet.id}')
-            if self.is_my_tweet(tweet) or tweet.id <= self.since_id:
-                logger.warning(f"You've already checked this or it's your own"
-                               ' tweet!')
-                print()
-                return None
+            # Return if tweet belongs to bot or is already checked.
+            if self.is_own_tweet(tweet):
+                return utils.log_stream_warning(
+                    'This is your own tweet, ignore!')
+            if tweet.id <= self.since_id:
+                return logger.warning(
+                    "You've already checked this tweet, ignore!")
 
+            time.sleep(10)
             self.since_id = tweet.id
-            logger.info(f'Current tweet text: {tweet.text}')
+            logger.info(f'Current tweet:\n{tweet.text}')
 
             # Reply to mention.
             if tweet.in_reply_to_status_id is None and self.is_mention(tweet):
@@ -90,45 +87,62 @@ class BotStreamListener(tweepy.StreamListener):
 
             # Like and retweet tracked tweets.
             self.like(tweet)
-            time.sleep(4)
+            time.sleep(0.1)
             self.retweet(tweet)
+            time.sleep(0.1)
 
-            logger.info(f'New since_id: {self.since_id}')
             print()
-            time.sleep(10)
         except tweepy.TweepError as e:
-            bots.utils.print_tweepy_error(e)
+            utils.log_tweepy_error(e)
 
-    def on_error(self, status_code):
-        """Handle errors in stream."""
+    @staticmethod
+    def on_error(status_code):
+        """Handle stream errors based on error status code."""
         if status_code == 420:
             print('Disconnected the stream')
             return False  # Disconnect stream
-        elif status_code == 429:
-            logger.info(f'Waiting 120 seconds...')
+        if status_code == 429:
+            logger.info('Waiting 120 seconds...')
             time.sleep(120)
         else:
             e = tweepy.TweepError
             logger.info(f'{e} (Status code: {status_code})')
 
 
-def get_stream(api: tweepy.API) -> tweepy.Stream:
+def create_stream(
+    api: tweepy.API, timeout: int = config.STREAM_TIMEOUT,
+) -> tweepy.Stream:
     """Get initialised stream."""
-    return tweepy.Stream(auth=api.auth, listener=BotStreamListener(api=api))
+    return tweepy.Stream(
+        auth=api.auth, listener=BotStreamListener(api=api), timeout=timeout)
 
 
-def filter_stream(api: tweepy.API, is_async: bool = True) -> None:
-    """Fetch and process tweets matching keywords and accounts."""
-    accounts: List[str] = [api.get_user(user_id).id_str for user_id in
-                           bots.config.ACCOUNTS_TO_WATCH]
-    stream = get_stream(api)
-    if bots.config.TRACK_HASHTAGS:
-        bots.config.KEYWORDS.update(bots.config.HASHTAGS)
-    if bots.config.TRACK_MENTIONS:
-        bots.config.KEYWORDS.add('@' + api.me().screen_name)
-    stream.filter(track=bots.config.KEYWORDS, follow=accounts,
-                  is_async=is_async)
+def filter_stream(
+    stream: tweepy.Stream,
+    api: tweepy.API,
+    is_async: bool = config.STREAM_USES_MULTIPLE_THREADS,
+) -> None:
+    """Fetch and process tweets matching keywords and watched accounts.
+    """
+    keywords: Set[str] = config.KEYWORDS.copy()
+    accounts: List[str] = [api.get_user(user_id).id_str
+                           for user_id in config.ACCOUNTS_TO_WATCH]
+    if config.TRACK_HASHTAGS:
+        keywords.update(config.HASHTAGS)
+    if config.TRACK_MENTIONS:
+        keywords.add('@' + api.me().screen_name)
+    try:
+        stream.filter(
+            track=keywords,
+            follow=accounts,
+            is_async=is_async,
+        )
+    except KeyboardInterrupt:
+        stream.disconnect()
+        print()
+        logger.info('Exiting stream on user request, bye!')
+        sys.exit()
 
 
 if __name__ == '__main__':
-    logger.info(f'Create and open a stream via the stream.py module.')
+    logger.info('Create and open a stream via the stream.py module.')

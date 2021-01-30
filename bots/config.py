@@ -23,6 +23,11 @@ ACTION_BRAKE: int = env.int('ACTION_BRAKE', 10)
 RATE_LIMIT_BREAK: int = env.int('RATE_LIMIT_BREAK', 60)
 
 
+# Stream settings.
+STREAM_TIMEOUT: int = env.int('STREAM_TIMEOUT', 60)
+STREAM_USES_MULTIPLE_THREADS: bool = env.bool('STREAM_USES_MULTIPLE_THREADS',
+                                              False)
+
 # Hashtags to track in stream.
 TRACK_HASHTAGS: bool = env.bool('TRACK_HASHTAGS', False)
 hashtags: List[str] = env.list('TRACKED_HASHTAGS', [])
@@ -34,7 +39,8 @@ PREFIX: str = env.str('KEYWORD_PREFIX', '')
 KEYWORDS_TO_PREFIX: List[str] = env.list('KEYWORDS_TO_PREFIX', [])
 PREFIXED_KEYWORDS: List[str] = [(PREFIX + ' ' + keyword).strip()
                                 for keyword in KEYWORDS_TO_PREFIX]
-KEYWORDS: Set[str] = set(PREFIXED_KEYWORDS + env.list('TRACKED_KEYWORDS', []))
+TRACKED_KEYWORDS: List[str] = env.list('TRACKED_KEYWORDS', [])
+KEYWORDS: Set[str] = set(PREFIXED_KEYWORDS + TRACKED_KEYWORDS)
 
 
 # Mentions.
