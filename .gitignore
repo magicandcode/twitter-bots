@@ -2,5 +2,6 @@
 .idea/
 .vscode/
 venv/
-.env*
+.env
+.env-dev
 *cache*
