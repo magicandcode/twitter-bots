@@ -6,16 +6,27 @@ from typing import List
 
 import tweepy
 
+from bots.logger import logger
 from bots.config import RATE_LIMIT_BREAK
 
 
-def print_tweepy_error(e) -> None:
+def log_tweepy_error(e) -> None:
     """Format and print TweepError."""
     response = e.response
-    print('Unable to create API!')
-    print(response.reason)
     for error in response.json().get('errors'):
-        print(f" > {error.get('message')} (code {error.get('code')})")
+        code: int = error.get('code')
+        message = f"{error.get('message')} (code {code})"
+        if code in (139, 160, 327):
+            logger.warning(message)
+        else:
+            logger.error(message)
+
+
+def log_stream_warning(message: str):
+    """Log and wait on a non-tweepy error in the stream."""
+    logger.warning(message)
+    print()
+    time.sleep(3)
 
 
 def limit_handler(cursor: tweepy.cursor.ItemIterator):
