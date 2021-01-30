@@ -3,7 +3,7 @@ Twitter API streaming module with stream listener and helper functions.
 """
 import time
 import sys
-from typing import List, Set
+from typing import Dict, Set
 
 import tweepy
 
@@ -57,8 +57,8 @@ class BotStreamListener(tweepy.StreamListener):
 
     @staticmethod
     def on_friends(friends):
-        # Todo: Look up what kind of event this method handles.
-        logger.info(f'on_friends triggered: {friends=}')
+        # Todo: Implement method.
+        logger.info(f'on_friends method triggered: {friends=}')
 
     def on_status(self, tweet: tweepy.Status) -> None:
         """Retweet and like matching tweets containing keywords and/or
@@ -91,9 +91,10 @@ class BotStreamListener(tweepy.StreamListener):
             self.retweet(tweet)
             time.sleep(0.1)
 
-            print()
         except tweepy.TweepError as e:
             utils.log_tweepy_error(e)
+        finally:
+            print()
 
     @staticmethod
     def on_error(status_code):
@@ -105,11 +106,10 @@ class BotStreamListener(tweepy.StreamListener):
             logger.info('Waiting 120 seconds...')
             time.sleep(120)
         else:
-            e = tweepy.TweepError
-            logger.info(f'{e} (Status code: {status_code})')
+            utils.log_tweepy_error(tweepy.TweepError)
 
 
-def create_stream(
+def create(
     api: tweepy.API, timeout: int = config.STREAM_TIMEOUT,
 ) -> tweepy.Stream:
     """Get initialised stream."""
@@ -117,20 +117,28 @@ def create_stream(
         auth=api.auth, listener=BotStreamListener(api=api), timeout=timeout)
 
 
-def filter_stream(
-    stream: tweepy.Stream,
-    api: tweepy.API,
-    is_async: bool = config.STREAM_USES_MULTIPLE_THREADS,
-) -> None:
-    """Fetch and process tweets matching keywords and watched accounts.
+def get_filter_params(api: tweepy.API) -> Dict[str, Set[str]]:
+    """Return keywords and accounts to watch based on application
+      settings.
     """
     keywords: Set[str] = config.KEYWORDS.copy()
-    accounts: List[str] = [api.get_user(user_id).id_str
-                           for user_id in config.ACCOUNTS_TO_WATCH]
+    accounts: Set[str] = {api.get_user(user_id).id_str
+                          for user_id in config.ACCOUNTS_TO_WATCH}
     if config.TRACK_HASHTAGS:
         keywords.update(config.HASHTAGS)
     if config.TRACK_MENTIONS:
         keywords.add('@' + api.me().screen_name)
+    return {'keywords': keywords, 'accounts': accounts}
+
+
+def filter(
+    stream: tweepy.Stream,
+    keywords,
+    accounts,
+    is_async: bool = config.STREAM_USES_MULTIPLE_THREADS,
+) -> None:
+    """Fetch and process tweets matching keywords and watched accounts.
+    """
     try:
         stream.filter(
             track=keywords,
